@@ -42,5 +42,3 @@ Makefile
 
 *.session
 *.tags
-compile_flags.txt
-fibonacci_numbers/fibonacci_numbers.txt
