@@ -12,17 +12,43 @@ int FibonacciRecursive(int n) {
     }
 }
 
+void FibonacciLoops(int n){
+    int x = 0;
+    int y = 1;
+    int z = 0;
+    for(int i = 0; i < n; i++){
+        cout << x << " ";
+        z = x + y;
+        x = y;
+        y = z;
+    }
+}
+
 int main()
 {
     int index = 0;
     int series;
+    int function_number;
     
     cout << "Enter the number of series: ";
     cin >> series;
-    cout << "\nFibonacci series: ";
-    while(index < series){
-        cout << " " << FibonacciRecursive(index);
-        index++;
+    cout << "Would you like to use a recursive(1) or iterative(2) function? ";
+    cin >> function_number;
+    
+    if(function_number == 1) {
+        cout << "\nFibonacci series (recursive function): ";
+        while(index < series){
+            cout << " " << FibonacciRecursive(index);
+            index++;
+        }
+    }
+    else if(function_number == 2) {
+        cout << "\nFibonacci series (iterative function): ";
+        FibonacciLoops(series);
+    }
+    else{
+        cout << "Not a valid choice..." << endl;
+        return 0;
     }
     cout << endl << endl;
 	return 0;
