@@ -1,7 +1,12 @@
 #include <iostream>
+#include <chrono>
 using std::cout;
 using std::cin;
 using std::endl;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
+
 
 int FibonacciRecursive(int n) {
     if(n == 0 || n == 1) {
@@ -28,28 +33,31 @@ int main()
 {
     int index = 0;
     int series;
-    int function_number;
     
-    cout << "Enter the number of series: ";
+    cout << "Hello Fibonacci!" << endl << endl;
+    
+    cout << "Enter number of series: ";
     cin >> series;
-    cout << "Would you like to use a recursive(1) or iterative(2) function? ";
-    cin >> function_number;
+
+    auto clock_start = high_resolution_clock::now();
+    cout << "\nFibonacci series (recursive function):" << endl;
+    while(index < series){
+        cout << FibonacciRecursive(index) << " ";
+        index++;
+    }
+    auto clock_finish = high_resolution_clock::now();
+    auto elapsed_time = duration_cast<microseconds>(clock_finish - clock_start);
+    cout << endl;
+    cout << "PERFORMANCE CHECK: Elapsed time (microseconds) for RECURSIVE function was " << elapsed_time.count() << endl;
     
-    if(function_number == 1) {
-        cout << "\nFibonacci series (recursive function): ";
-        while(index < series){
-            cout << " " << FibonacciRecursive(index);
-            index++;
-        }
-    }
-    else if(function_number == 2) {
-        cout << "\nFibonacci series (iterative function): ";
-        FibonacciLoops(series);
-    }
-    else{
-        cout << "Not a valid choice..." << endl;
-        return 0;
-    }
+    clock_start = high_resolution_clock::now();
+    cout << "\nFibonacci series (iterative function):" << endl;
+    FibonacciLoops(series);
+    clock_finish = high_resolution_clock::now();
+    elapsed_time = duration_cast<microseconds>(clock_finish - clock_start);
+    cout << endl;
+    cout << "PERFORMANCE CHECK: Elapsed time (microseconds) for ITERATIVE function was " << elapsed_time.count() << endl;
+    
     cout << endl << endl;
 	return 0;
 }
