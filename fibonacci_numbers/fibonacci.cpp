@@ -35,7 +35,6 @@ int main()
     int series;
     
     cout << "Hello Fibonacci!" << endl << endl;
-    
     cout << "Enter number of series: ";
     cin >> series;
 
