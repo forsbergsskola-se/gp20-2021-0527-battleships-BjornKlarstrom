@@ -1,12 +1,13 @@
 ﻿#pragma once
+#include "Ship.h"
 
 class BattleField
 {
-private:
     static void SetupField();
-   
+
 public:
     static void DrawBattleField();
     static void DrawTargetField();
+    bool PlaceShip(int x,int y,Ship ship);
     BattleField();
 };
