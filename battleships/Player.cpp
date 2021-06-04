@@ -16,6 +16,7 @@ Player::Player()
 
 void Player::PlaceShips()
 {
+    
     playerField.DrawBattleField();
 }
 
