@@ -2,10 +2,11 @@
 
 class BattleField
 {
+private:
     static void SetupField();
-    static void DrawBattleField();
-    static void DrawTargetField();
    
 public:
-    static void Run();
+    static void DrawBattleField();
+    static void DrawTargetField();
+    BattleField();
 };

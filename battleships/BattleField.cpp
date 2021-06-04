@@ -6,6 +6,11 @@ char playerPosition[10][10];
 char targetPosition[10][10];
 const int fieldSize = sizeof playerPosition / sizeof playerPosition[0];
 
+BattleField::BattleField()
+{
+    SetupField();
+}
+
 void BattleField::SetupField()
 {
     for(int x = 0; x < fieldSize; x++)
@@ -16,12 +21,6 @@ void BattleField::SetupField()
             targetPosition[x][y] = '~';
         }
     }
-}
-
-void BattleField::Run()
-{
-    SetupField();
-    DrawBattleField();
 }
 
 void BattleField::DrawBattleField()
