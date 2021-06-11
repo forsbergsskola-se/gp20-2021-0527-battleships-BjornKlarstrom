@@ -1,56 +1,207 @@
-#include "BattleField.h"
 #include <iostream>
+#include "BattleField.h"
 using namespace std;
 
-char playerPosition[10][10];
-char targetPosition[10][10];
-const int fieldSize = sizeof playerPosition / sizeof playerPosition[0];
-
-BattleField::BattleField()
-{
-    SetupField();
+bool Field::IsWin() {
+	for (int i = 0; i < 10; i++) {
+		for (int x = 0; x < 10; x++) {
+			if (!(playerArray[i][x] == 'M' || playerArray[i][x] == 'H' || playerArray[i][x] == ' '))
+				return false;
+		}
+	}
+	return true;
 }
 
-void BattleField::SetupField()
-{
-    for(int x = 0; x < fieldSize; x++)
-    {
-        for(int y = 0; y < fieldSize; y++)
-        {
-            playerPosition[x][y] = '~';
-            targetPosition[x][y] = '~';
-        }
-    }
+void Field::DestroyedShip(Ship& s1, Ship& s2, Ship& s3, Ship& s4, Ship& s5) {
+	CheckShip(s1);
+	CheckShip(s2);
+	CheckShip(s3);
+	CheckShip(s4);
+	CheckShip(s5);
+}
+void Field::CheckShip(Ship& ship) {
+	if (ship.isDestroyed)return;
+	int occurence = 0;
+	for (int i = 0; i < 10; i++) {
+		for (int x = 0; x < 10; x++) {
+			if (playerArray[i][x] == ship.GetSymbol()) {
+				occurence++;
+			}
+		}
+	}
+	if (occurence == 0) {
+		ship.isDestroyed = true;
+		cout << "You destroyed a " << ship.GetName() << "!" << endl;
+		cin.get();
+	}
+}
+bool Field::PlaceShip(int x, int y, Ship ship) {
+	if (playerArray[x][y] == ' ') {
+		bool right = true;
+		bool downwards = true;
+		for (int i = 0; i < ship.GetSize(); i++) {
+			if (playerArray[x + i][y] != ' ' || x + i > 9 || x + i < 0) {
+				downwards = false;
+			}
+			if (playerArray[x][y + 1] != ' ' || y + i > 9 || y + i < 0) {
+				right = false;
+			}
+		}
+		return PlaceSymbol(downwards, right, ship, x, y);
+	}
+	else return false;
+}
+bool Field::IsHit(int x, int y) {
+	if (playerArray[x][y] == ' ') {
+		playerArray[x][y] = 'M';
+		cout << "   You Missed!" << endl;
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin.get();
+		return false;
+	}
+	else if (playerArray[x][y] == 'H') {
+		cout << "   You already hit that!" << endl;
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin.get();
+		return true;
+	}
+	else if (playerArray[x][y] == 'M') {
+		cout << "  You Missed!" << endl;
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin.get();
+		return false;
+	}
+	playerArray[x][y] = 'H';
+	cout << "   You Hit!" << endl;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	cin.get();
+	
+	return true;
+}
+void Field::SetBombSymbol(int x, int y, bool b) {
+	if (b)
+		attackArray[x][y] = 'H';
+	else
+		attackArray[x][y] = 'M';
 }
 
-void BattleField::DrawBattleField()
+
+auto Field::PlaceSymbol(bool downwards, bool right, Ship ship, int x, int y) -> bool
 {
-    cout << "      0   1   2   3   4   5   6   7   8   9 " << endl;
-    cout << "   A  " << playerPosition[0][0] << "   " << playerPosition[0][1] << "   " << playerPosition[0][2] << "   " << playerPosition[0][3] << "   " << playerPosition[0][4] << "   " << playerPosition[0][5] << "   " << playerPosition[0][6] << "   " << playerPosition[0][7] << "   " << playerPosition[0][8] << "   " << playerPosition[0][9] << "  " << endl;
-    cout << "   B  " << playerPosition[1][0] << "   " << playerPosition[1][1] << "   " << playerPosition[1][2] << "   " << playerPosition[1][3] << "   " << playerPosition[1][4] << "   " << playerPosition[1][5] << "   " << playerPosition[1][6] << "   " << playerPosition[1][7] << "   " << playerPosition[1][8] << "   " << playerPosition[1][9] << "  " << endl;
-    cout << "   C  " << playerPosition[2][0] << "   " << playerPosition[2][1] << "   " << playerPosition[2][2] << "   " << playerPosition[2][3] << "   " << playerPosition[2][4] << "   " << playerPosition[2][5] << "   " << playerPosition[2][6] << "   " << playerPosition[2][7] << "   " << playerPosition[2][8] << "   " << playerPosition[2][9] << "  " << endl;
-    cout << "   D  " << playerPosition[3][0] << "   " << playerPosition[3][1] << "   " << playerPosition[3][2] << "   " << playerPosition[3][3] << "   " << playerPosition[3][4] << "   " << playerPosition[3][5] << "   " << playerPosition[3][6] << "   " << playerPosition[3][7] << "   " << playerPosition[3][8] << "   " << playerPosition[3][9] << "  " << endl;
-    cout << "   E  " << playerPosition[4][0] << "   " << playerPosition[4][1] << "   " << playerPosition[4][2] << "   " << playerPosition[4][3] << "   " << playerPosition[4][4] << "   " << playerPosition[4][5] << "   " << playerPosition[4][6] << "   " << playerPosition[4][7] << "   " << playerPosition[4][8] << "   " << playerPosition[4][9] << "  " << endl;
-    cout << "   F  " << playerPosition[5][0] << "   " << playerPosition[5][1] << "   " << playerPosition[5][2] << "   " << playerPosition[5][3] << "   " << playerPosition[5][4] << "   " << playerPosition[5][5] << "   " << playerPosition[5][6] << "   " << playerPosition[5][7] << "   " << playerPosition[5][8] << "   " << playerPosition[5][9] << "  " << endl;
-    cout << "   G  " << playerPosition[6][0] << "   " << playerPosition[6][1] << "   " << playerPosition[6][2] << "   " << playerPosition[6][3] << "   " << playerPosition[6][4] << "   " << playerPosition[6][5] << "   " << playerPosition[6][6] << "   " << playerPosition[6][7] << "   " << playerPosition[6][8] << "   " << playerPosition[6][9] << "  " << endl;
-    cout << "   H  " << playerPosition[7][0] << "   " << playerPosition[7][1] << "   " << playerPosition[7][2] << "   " << playerPosition[7][3] << "   " << playerPosition[7][4] << "   " << playerPosition[7][5] << "   " << playerPosition[7][6] << "   " << playerPosition[7][7] << "   " << playerPosition[7][8] << "   " << playerPosition[7][9] << "  " << endl;
-    cout << "   I  " << playerPosition[8][0] << "   " << playerPosition[8][1] << "   " << playerPosition[8][2] << "   " << playerPosition[8][3] << "   " << playerPosition[8][4] << "   " << playerPosition[8][5] << "   " << playerPosition[8][6] << "   " << playerPosition[8][7] << "   " << playerPosition[8][8] << "   " << playerPosition[8][9] << "  " << endl;
-    cout << "   J  " << playerPosition[9][0] << "   " << playerPosition[9][1] << "   " << playerPosition[9][2] << "   " << playerPosition[9][3] << "   " << playerPosition[9][4] << "   " << playerPosition[9][5] << "   " << playerPosition[9][6] << "   " << playerPosition[9][7] << "   " << playerPosition[9][8] << "   " << playerPosition[9][9] << "  " << endl;
+	if (downwards && right) {
+		cout << "Horizontal or Vertical enter : h/v" << endl;
+		char hz;
+		cin >> hz;
+		hz = tolower(hz);
+		if (hz == 'v') {
+			for (int i = 0; i < ship.GetSize(); i++) {
+				playerArray[x + i][y] = ship.GetSymbol();
+			}
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			return true;
+		}
+		else if (hz == 'h') {
+			for (int i = 0; i < ship.GetSize(); i++) {
+				playerArray[x][y + i] = ship.GetSymbol();
+			}
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			return true;
+		}else {
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "----Invalid Input try again----" << endl;
+			return PlaceSymbol(downwards, right, ship, x, y);
+		}
+	}
+	else if (downwards) {
+		for (int i = 0; i < ship.GetSize(); i++) {
+			playerArray[x + i][y] = ship.GetSymbol();
+		}
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		return true;
+	}
+	else if (right) {
+		for (int i = 0; i < ship.GetSize(); i++) {
+			playerArray[x][y + i] = ship.GetSymbol();
+		}
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		return true;
+	}
+	else {
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "----Invalid Input try again----" << endl;
+		return PlaceSymbol(downwards, right, ship, x, y);
+	}
+	return false;
 }
-    
-void BattleField::DrawTargetField()
-{
-    cout << " " << endl;
-        
-    cout << "      0   1   2   3   4   5   6   7   8   9 " << endl;
-    cout << "   A  " << targetPosition[0][0] << "   " << targetPosition[0][1] << "   " << targetPosition[0][2] << "   " << targetPosition[0][3] << "   " << targetPosition[0][4] << "   " << targetPosition[0][5] << "   " << targetPosition[0][6] << "   " << targetPosition[0][7] << "   " << targetPosition[0][8] << "   " << targetPosition[0][9] << "  " << endl;
-    cout << "   B  " << targetPosition[1][0] << "   " << targetPosition[1][1] << "   " << targetPosition[1][2] << "   " << targetPosition[1][3] << "   " << targetPosition[1][4] << "   " << targetPosition[1][5] << "   " << targetPosition[1][6] << "   " << targetPosition[1][7] << "   " << targetPosition[1][8] << "   " << targetPosition[1][9] << "  " << endl;
-    cout << "   C  " << targetPosition[2][0] << "   " << targetPosition[2][1] << "   " << targetPosition[2][2] << "   " << targetPosition[2][3] << "   " << targetPosition[2][4] << "   " << targetPosition[2][5] << "   " << targetPosition[2][6] << "   " << targetPosition[2][7] << "   " << targetPosition[2][8] << "   " << targetPosition[2][9] << "  " << endl;
-    cout << "   D  " << targetPosition[3][0] << "   " << targetPosition[3][1] << "   " << targetPosition[3][2] << "   " << targetPosition[3][3] << "   " << targetPosition[3][4] << "   " << targetPosition[3][5] << "   " << targetPosition[3][6] << "   " << targetPosition[3][7] << "   " << targetPosition[3][8] << "   " << targetPosition[3][9] << "  " << endl;
-    cout << "   E  " << targetPosition[4][0] << "   " << targetPosition[4][1] << "   " << targetPosition[4][2] << "   " << targetPosition[4][3] << "   " << targetPosition[4][4] << "   " << targetPosition[4][5] << "   " << targetPosition[4][6] << "   " << targetPosition[4][7] << "   " << targetPosition[4][8] << "   " << targetPosition[4][9] << "  " << endl;
-    cout << "   F  " << targetPosition[5][0] << "   " << targetPosition[5][1] << "   " << targetPosition[5][2] << "   " << targetPosition[5][3] << "   " << targetPosition[5][4] << "   " << targetPosition[5][5] << "   " << targetPosition[5][6] << "   " << targetPosition[5][7] << "   " << targetPosition[5][8] << "   " << targetPosition[5][9] << "  " << endl;
-    cout << "   G  " << targetPosition[6][0] << "   " << targetPosition[6][1] << "   " << targetPosition[6][2] << "   " << targetPosition[6][3] << "   " << targetPosition[6][4] << "   " << targetPosition[6][5] << "   " << targetPosition[6][6] << "   " << targetPosition[6][7] << "   " << targetPosition[6][8] << "   " << targetPosition[6][9] << "  " << endl;
-    cout << "   H  " << targetPosition[7][0] << "   " << targetPosition[7][1] << "   " << targetPosition[7][2] << "   " << targetPosition[7][3] << "   " << targetPosition[7][4] << "   " << targetPosition[7][5] << "   " << targetPosition[7][6] << "   " << targetPosition[7][7] << "   " << targetPosition[7][8] << "   " << targetPosition[7][9] << "  " << endl;
-    cout << "   I  " << targetPosition[8][0] << "   " << targetPosition[8][1] << "   " << targetPosition[8][2] << "   " << targetPosition[8][3] << "   " << targetPosition[8][4] << "   " << targetPosition[8][5] << "   " << targetPosition[8][6] << "   " << targetPosition[8][7] << "   " << targetPosition[8][8] << "   " << targetPosition[8][9] << "  " << endl;
-    cout << "   J  " << targetPosition[9][0] << "   " << targetPosition[9][1] << "   " << targetPosition[9][2] << "   " << targetPosition[9][3] << "   " << targetPosition[9][4] << "   " << targetPosition[9][5] << "   " << targetPosition[9][6] << "   " << targetPosition[9][7] << "   " << targetPosition[9][8] << "   " << targetPosition[9][9] << "  " << endl;
+void Field::ShowBombField(string str) {
+	cout << "\n\n\t\t\t\t  BattleShip\n\n";
+	cout << "\t\t\t\t   " << str << "\n";
+	cout << "\t\t\t\t    IsHit \n\n";
+	cout << "	  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |" << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	A |  " << attackArray[0][0] << "  |  " << attackArray[0][1] << "  |  " << attackArray[0][2] << "  |  " << attackArray[0][3] << "  |  " << attackArray[0][4] << "  |  " << attackArray[0][5] << "  |  " << attackArray[0][6] << "  |  " << attackArray[0][7] << "  |  " << attackArray[0][8] << "  |  " << attackArray[0][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	B |  " << attackArray[1][0] << "  |  " << attackArray[1][1] << "  |  " << attackArray[1][2] << "  |  " << attackArray[1][3] << "  |  " << attackArray[1][4] << "  |  " << attackArray[1][5] << "  |  " << attackArray[1][6] << "  |  " << attackArray[1][7] << "  |  " << attackArray[1][8] << "  |  " << attackArray[1][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	C |  " << attackArray[2][0] << "  |  " << attackArray[2][1] << "  |  " << attackArray[2][2] << "  |  " << attackArray[2][3] << "  |  " << attackArray[2][4] << "  |  " << attackArray[2][5] << "  |  " << attackArray[2][6] << "  |  " << attackArray[2][7] << "  |  " << attackArray[2][8] << "  |  " << attackArray[2][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	D |  " << attackArray[3][0] << "  |  " << attackArray[3][1] << "  |  " << attackArray[3][2] << "  |  " << attackArray[3][3] << "  |  " << attackArray[3][4] << "  |  " << attackArray[3][5] << "  |  " << attackArray[3][6] << "  |  " << attackArray[3][7] << "  |  " << attackArray[3][8] << "  |  " << attackArray[3][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	E |  " << attackArray[4][0] << "  |  " << attackArray[4][1] << "  |  " << attackArray[4][2] << "  |  " << attackArray[4][3] << "  |  " << attackArray[4][4] << "  |  " << attackArray[4][5] << "  |  " << attackArray[4][6] << "  |  " << attackArray[4][7] << "  |  " << attackArray[4][8] << "  |  " << attackArray[4][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	F |  " << attackArray[5][0] << "  |  " << attackArray[5][1] << "  |  " << attackArray[5][2] << "  |  " << attackArray[5][3] << "  |  " << attackArray[5][4] << "  |  " << attackArray[5][5] << "  |  " << attackArray[5][6] << "  |  " << attackArray[5][7] << "  |  " << attackArray[5][8] << "  |  " << attackArray[5][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	G |  " << attackArray[6][0] << "  |  " << attackArray[6][1] << "  |  " << attackArray[6][2] << "  |  " << attackArray[6][3] << "  |  " << attackArray[6][4] << "  |  " << attackArray[6][5] << "  |  " << attackArray[6][6] << "  |  " << attackArray[6][7] << "  |  " << attackArray[6][8] << "  |  " << attackArray[6][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	H |  " << attackArray[7][0] << "  |  " << attackArray[7][1] << "  |  " << attackArray[7][2] << "  |  " << attackArray[7][3] << "  |  " << attackArray[7][4] << "  |  " << attackArray[7][5] << "  |  " << attackArray[7][6] << "  |  " << attackArray[7][7] << "  |  " << attackArray[7][8] << "  |  " << attackArray[7][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	I |  " << attackArray[8][0] << "  |  " << attackArray[8][1] << "  |  " << attackArray[8][2] << "  |  " << attackArray[8][3] << "  |  " << attackArray[8][4] << "  |  " << attackArray[8][5] << "  |  " << attackArray[8][6] << "  |  " << attackArray[8][7] << "  |  " << attackArray[8][8] << "  |  " << attackArray[8][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	J |  " << attackArray[9][0] << "  |  " << attackArray[9][1] << "  |  " << attackArray[9][2] << "  |  " << attackArray[9][3] << "  |  " << attackArray[9][4] << "  |  " << attackArray[9][5] << "  |  " << attackArray[9][6] << "  |  " << attackArray[9][7] << "  |  " << attackArray[9][8] << "  |  " << attackArray[9][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+
 }
+void Field::ShowShipField(string str) {
+	cout << "\n\n\t\t\t\t  BattleShip\n\n";
+	cout << "\t\t\t\t   " << str << "\n\n";
+	cout << "	  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |" << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	A |  " << playerArray[0][0] << "  |  " << playerArray[0][1] << "  |  " << playerArray[0][2] << "  |  " << playerArray[0][3] << "  |  " << playerArray[0][4] << "  |  " << playerArray[0][5] << "  |  " << playerArray[0][6] << "  |  " << playerArray[0][7] << "  |  " << playerArray[0][8] << "  |  " << playerArray[0][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	B |  " << playerArray[1][0] << "  |  " << playerArray[1][1] << "  |  " << playerArray[1][2] << "  |  " << playerArray[1][3] << "  |  " << playerArray[1][4] << "  |  " << playerArray[1][5] << "  |  " << playerArray[1][6] << "  |  " << playerArray[1][7] << "  |  " << playerArray[1][8] << "  |  " << playerArray[1][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	C |  " << playerArray[2][0] << "  |  " << playerArray[2][1] << "  |  " << playerArray[2][2] << "  |  " << playerArray[2][3] << "  |  " << playerArray[2][4] << "  |  " << playerArray[2][5] << "  |  " << playerArray[2][6] << "  |  " << playerArray[2][7] << "  |  " << playerArray[2][8] << "  |  " << playerArray[2][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	D |  " << playerArray[3][0] << "  |  " << playerArray[3][1] << "  |  " << playerArray[3][2] << "  |  " << playerArray[3][3] << "  |  " << playerArray[3][4] << "  |  " << playerArray[3][5] << "  |  " << playerArray[3][6] << "  |  " << playerArray[3][7] << "  |  " << playerArray[3][8] << "  |  " << playerArray[3][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	E |  " << playerArray[4][0] << "  |  " << playerArray[4][1] << "  |  " << playerArray[4][2] << "  |  " << playerArray[4][3] << "  |  " << playerArray[4][4] << "  |  " << playerArray[4][5] << "  |  " << playerArray[4][6] << "  |  " << playerArray[4][7] << "  |  " << playerArray[4][8] << "  |  " << playerArray[4][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	F |  " << playerArray[5][0] << "  |  " << playerArray[5][1] << "  |  " << playerArray[5][2] << "  |  " << playerArray[5][3] << "  |  " << playerArray[5][4] << "  |  " << playerArray[5][5] << "  |  " << playerArray[5][6] << "  |  " << playerArray[5][7] << "  |  " << playerArray[5][8] << "  |  " << playerArray[5][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	G |  " << playerArray[6][0] << "  |  " << playerArray[6][1] << "  |  " << playerArray[6][2] << "  |  " << playerArray[6][3] << "  |  " << playerArray[6][4] << "  |  " << playerArray[6][5] << "  |  " << playerArray[6][6] << "  |  " << playerArray[6][7] << "  |  " << playerArray[6][8] << "  |  " << playerArray[6][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	H |  " << playerArray[7][0] << "  |  " << playerArray[7][1] << "  |  " << playerArray[7][2] << "  |  " << playerArray[7][3] << "  |  " << playerArray[7][4] << "  |  " << playerArray[7][5] << "  |  " << playerArray[7][6] << "  |  " << playerArray[7][7] << "  |  " << playerArray[7][8] << "  |  " << playerArray[7][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	I |  " << playerArray[8][0] << "  |  " << playerArray[8][1] << "  |  " << playerArray[8][2] << "  |  " << playerArray[8][3] << "  |  " << playerArray[8][4] << "  |  " << playerArray[8][5] << "  |  " << playerArray[8][6] << "  |  " << playerArray[8][7] << "  |  " << playerArray[8][8] << "  |  " << playerArray[8][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+	cout << "	J |  " << playerArray[9][0] << "  |  " << playerArray[9][1] << "  |  " << playerArray[9][2] << "  |  " << playerArray[9][3] << "  |  " << playerArray[9][4] << "  |  " << playerArray[9][5] << "  |  " << playerArray[9][6] << "  |  " << playerArray[9][7] << "  |  " << playerArray[9][8] << "  |  " << playerArray[9][9] << "  |  " << endl;
+	cout << "	  -------------------------------------------------------------" << endl;
+}
+Field::Field() {
+	Setup();
+}
+void Field::Setup() {
+	for (int i = 0; i < 10; i++) {
+		for (int x = 0; x < 10; x++) {
+			playerArray[i][x] = ' ';
+			attackArray[i][x] = ' ';
+
+		}
+	}
+};

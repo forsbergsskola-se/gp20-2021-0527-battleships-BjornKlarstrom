@@ -2,15 +2,16 @@
 #include <string>
 using namespace std;
 
-class Ship
-{
-    string shipName;
-    char shipSymbol;
-    int shipSize;
+class Ship {
+    private:
+    string name;
+    int size;
+    char symbol;
     
 public:
-    string GetName() const;
-    char GetSymbol() const;
-    int GetSize() const;
-    Ship(string name, int size, char symbol);
+    bool isDestroyed = false;
+    string GetName();
+    int GetSize();
+    char GetSymbol();
+    Ship(std::string name,int size, char symbol);
 };

@@ -1,26 +1,18 @@
 ﻿#include "Ship.h"
 #include <string>
-using namespace std;
 
-Ship::Ship(string name, int size, char symbol)
-{
-    shipName = name;
-    shipSize = size;
-    shipSymbol = symbol;
+char Ship::GetSymbol() {
+    return symbol;
 }
 
-string Ship::GetName() const
-{
-    return shipName;
+int Ship::GetSize() {
+    return size;
 }
-
-int Ship::GetSize() const
-{
-    return shipSize;
+std::string Ship::GetName() {
+    return name;
 }
-
-char Ship::GetSymbol() const
-{
-    return shipSymbol;
-}
-
+Ship::Ship(std::string shipName,int shipSize, char shipSymbol){
+    size = shipSize;
+    symbol = shipSymbol;
+    name = shipName;
+};

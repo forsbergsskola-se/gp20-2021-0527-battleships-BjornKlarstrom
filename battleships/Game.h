@@ -1,13 +1,15 @@
 ﻿#pragma once
 #include "Player.h"
+#include <string>
+using namespace std;
 
-class Game {
-
-    Player playerOne;
-    //Player playerTwo;
-    void Setup();
-
-public:
-    Game();
-    void Run();
+class BattleShips {
+    private:
+        Player playerOne;
+        Player playerTwo;
+        bool CheckWin();
+        
+    public:
+        BattleShips();
+        void Start();
 };
